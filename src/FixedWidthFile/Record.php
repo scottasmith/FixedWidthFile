@@ -171,7 +171,7 @@ class Record
                 throw new \Exception("Can't find field formatter for format $format");
             }
 
-            $fieldFormatterName = 'TextFileParse\\Formatters\\' . $format;
+            $fieldFormatterName = __NAMESPACE__ . '\\Formatters\\' . $format;
 
             $fieldFormatter = new $fieldFormatterName;
             $fieldValue = $fieldFormatter->format($data[$name], $field->getLength());

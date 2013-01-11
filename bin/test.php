@@ -3,9 +3,11 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use FixedWidthFile\Specification\Field;
-use FixedWidthFile\Record;
+use FixedWidthFile\Specification\Record;
+use FixedWidthFile\FieldCollection;
+use FixedWidthFile\RecordParser;
 
-$fieldData  = array(
+$fieldSpecificationList  = array(
     array(
         'name'       => 'RecordIdentifier',
         'position'   => 0,
@@ -23,18 +25,29 @@ $fieldData  = array(
     )
 );
 
-$record = new Record();
+$fieldCollection = new FieldCollection();
 
-foreach ($fieldData as $data) {
-    $field  = new Field($data);
-    $record->addField($field);
+foreach ($fieldSpecificationList as $fieldSpecification) {
+    $field  = new Field($fieldSpecification);
+    $fieldCollection->addField($field);
 }
 
-$recordString = $record->buildRecord(array(
+$recordSpecification = new Record(array(
+    'name' => 'TestLine',
+    'description' => 'TestDescription',
+    'priority' => 1,
+    'keyField' => 'RecordIdentifier'
+));
+
+
+$recordParser = new RecordParser;
+$recordParser->setFieldCollection($fieldCollection);
+$recordParser->setRecordSpecification($recordSpecification);
+
+$recordString = $recordParser->buildRecord(array(
     'RecordIdentifier' => 'TST',
     'Size' => '1302299331'
 ));
 
-$recordData = $record->decodeRecord($recordString);
+$recordData = $recordParser->decodeRecord($recordString);
 print_r($recordData);
-

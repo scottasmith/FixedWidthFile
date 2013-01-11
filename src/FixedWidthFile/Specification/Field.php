@@ -1,6 +1,8 @@
 <?php
 namespace FixedWidthFile\Specification;
 
+use FixedWidthFile\Specification\SpecificationException;
+
 class Field
 {
     /**
@@ -49,6 +51,7 @@ class Field
      * Constructor
      *
      * @param array (optional)
+     * @throws SpecificationException
      */
     public function __construct($data = null)
     {
@@ -61,19 +64,20 @@ class Field
      * Import from array
      *
      * @param array
-     * @throws Exception
+     * @throws SpecificationException
      */
     public function fromArray($data)
     {
         if (!is_array($data)) {
-            throw new \Exception('data is not an Array');
+            throw new SpecificationException('Data is not an Array');
         }
 
         $mandatoryFields = array('name', 'position', 'length', 'format', 'validation');
 
-        foreach (get_object_vars($this) as $name => $value) {
+        $objectVars = get_object_vars($this);
+        foreach ($objectVars as $name => $value) {
             if (in_array($name, $mandatoryFields) && !array_key_exists($name, $data)) {
-                throw new \Exception("Mandatory field '$name' does not exist");
+                throw new SpecificationException("Mandatory field '$name' does not exist");
             }
 
             if (array_key_exists($name, $data)) {

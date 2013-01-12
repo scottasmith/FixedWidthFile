@@ -3,14 +3,13 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use FixedWidthFile\Specification;
+use FixedWidthFile\SpecificationBuilder\ArrayBuilder;
 use FixedWidthFile\Collection;
 use FixedWidthFile\RecordParser;
-use FixedWidthFile\SpecificationBuilder\ArrayBuilder;
+use FixedWidthFile\EncodeFile;
+use FixedWidthFile\DecodeFile;
 
 $records = include 'config.php';
-
-$builder = new ArrayBuilder;
-$recordCollection = $builder->build($records);
 
 $testRecords = array(
     array(
@@ -46,53 +45,20 @@ $testRecords = array(
     )
 );
 
+$builder = new ArrayBuilder;
+$recordCollection = $builder->build($records);
+
 echo "Encode: -\n\n";
 
-print_r($testRecords);
+$encode = new EncodeFile;
+$encode->setRecordCollection($recordCollection);
+$lines = $encode->encode($testRecords);
+echo $lines;
 
-$lineArray = array();
-foreach ($testRecords as $recordItem) {
-
-    $recordSpecification = $recordCollection->find($recordItem['identifier']);
-    if (!$recordSpecification)
-    {
-        echo "Cannot find specification: {$recordItem['identifier']}\n\n";
-        exit;
-    }
-
-    $parser = new RecordParser;
-    $parser->setRecordSpecification($recordSpecification);
-    $recordString = $parser->buildRecord($recordItem['fields']);
-
-    $lineArray[] = $recordString;
-};
-
-echo implode($lineArray, "\n");
 echo "\n\n";
-
 echo "Decode: -\n\n";
 
-$lineData = array();
-foreach ($lineArray as $line)
-{
-    $recordSpecification = $recordCollection->find($line);
-    if (!$recordSpecification)
-    {
-        echo "Cannot find specification: $recordName\n\n";
-        exit;
-    }
-
-    $recordName = $recordSpecification->getName();
-    $line = substr($line, strLen($recordName));
-
-    $parser = new RecordParser;
-    $parser->setRecordSpecification($recordSpecification);
-    $data = $parser->decodeRecord($line);
-
-    $lineData[] = array(
-        'identifier' => $recordName,
-        'fields'     => $data
-    );
-}
-
-print_r($lineData);
+$decode = new DecodeFile;
+$decode->setRecordCollection($recordCollection);
+$data = $decode->decode($lines);
+print_r($data);

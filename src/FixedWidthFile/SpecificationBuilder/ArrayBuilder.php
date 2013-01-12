@@ -12,9 +12,9 @@ class ArrayBuilder extends BaseBuilder
      * Build field collection
      *
      * @param array $fields
-     * @return
+     * @return array
      */
-    protected function buildFieldCollection($fields)
+    public function buildFieldCollection($fields)
     {
         $fieldCollection = new FieldCollection;
         foreach ($fields as $fieldSpecification)

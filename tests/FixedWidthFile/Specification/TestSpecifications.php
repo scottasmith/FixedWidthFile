@@ -46,7 +46,7 @@ class TestSpecifications
         );
     }
 
-    static public function getRecordLines()
+    static public function getRecordLine()
     {
         return array(
             'recordSpecification' => array(

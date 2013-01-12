@@ -22,16 +22,18 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
         $this->helper->setRecordSpecification($recordSpec);
 
         $recordSpec2 = $this->helper->getRecordSpecification();
-        $this->assertEquals($recordSpec->getName(), $recordSpec2->getName());
+
+        $this->assertEquals($recordSpec->getName(), $recordSpec2->getName(),
+                            'Record specification names doe not match');
     }
 
     public function testFieldValidation()
     {
         $ret = $this->helper->validateField('123abc', '[[:alnum:]]');
-        $this->assertTrue($ret);
+        $this->assertTrue($ret, 'Validation of \'123abc\' failed');
 
         $ret = $this->helper->validateField('123%abc', '[[:alnum:]]');
-        $this->assertNull($ret);
+        $this->assertNull($ret, 'Validation of \'123%abc\' failed');
     }
 
     public function testCheckGoodData()
@@ -40,7 +42,7 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
         $data = array('RecordIdentifier' => '123abc');
         $ret = $this->helper->checkData($field, $data, $errorString);
-        $this->assertTrue($ret);
+        $this->assertTrue($ret, 'checkData failed');
     }
 
     public function testCheckNoData()
@@ -49,8 +51,10 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
         $data = array();
         $ret = $this->helper->checkData($field, $data, $errorString);
-        $this->assertNull($ret);
-        $this->assertEquals($errorString, 'Field RecordIdentifier not provided');
+
+        $this->assertNull($ret, 'checkData did not fail');
+        $this->assertEquals($errorString, 'Field RecordIdentifier not provided',
+                            'Didnt get failed message');
     }
 
     public function testCheckMandatoryEmptyData()
@@ -60,8 +64,10 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
         $data = array('RecordIdentifier' => '');
         $ret = $this->helper->checkData($field, $data, $errorString);
-        $this->assertNull($ret);
-        $this->assertEquals($errorString, 'Mandatory field RecordIdentifier is empty');
+
+        $this->assertNull($ret, 'checkData did not fail');
+        $this->assertEquals($errorString, 'Mandatory field RecordIdentifier is empty',
+                            'Didnt get failed message');
     }
 
     public function testCheckDataValidation()
@@ -70,13 +76,14 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
         $data = array('RecordIdentifier' => '£$£$');
         $ret = $this->helper->checkData($field, $data, $errorString);
-        $this->assertNull($ret);
-        $this->assertEquals($errorString, 'Validation failed on field RecordIdentifier');
+        $this->assertNull($ret, 'checkData did not fail');
+        $this->assertEquals($errorString, 'Validation failed on field RecordIdentifier',
+                            'Didnt get failed message');
     }
 
     private function prepareRecodSpecification()
     {
-        $specification = TestSpecifications::getRecordLines();
+        $specification = TestSpecifications::getRecordLine();
 
         $fieldCollection = new FieldCollection();
         foreach ($specification['fields'] as $fieldSpecification) {
@@ -102,7 +109,8 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
             'Size' => '112233'
         ));
 
-        $this->assertEquals($recordString, 'LINESPEC1TST  00112233');
+        $this->assertEquals($recordString, 'LINESPEC1TST  00112233',
+                            'buildRecord did not build correct line');
     }
 
     public function testDecodeRecord()
@@ -120,6 +128,7 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
         $recordData = $this->helper->decodeRecord($recordString);
 
-        $this->assertTrue((string)$recordData === (string)$data);
+        $this->assertTrue((string)$recordData === (string)$data,
+                          'Original array and returned array  are not the same');
     }
 }

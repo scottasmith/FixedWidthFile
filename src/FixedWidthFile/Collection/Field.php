@@ -1,24 +1,24 @@
 <?php
 namespace FixedWidthFile\Collection;
 
-use FixedWidthFile\Specification\Field as SpecificationField;
+use FixedWidthFile\Specification\Field as FieldSpecification;
 
 class Field extends CollectionBase
 {
     /**
      * Add item to collection
      *
-     * @param  array|SpecificationField
+     * @param  array|FieldSpecification
      * @return fluent interface
      */
     public function addField($field)
     {
-        if (!is_array($field) && !$field instanceof SpecificationField) {
+        if (!is_array($field) && !$field instanceof FieldSpecification) {
             throw new SpecificationException('field needs to be either an array or instance of ' . __NAMESPACE__ . '\\Collection\\Field');
         }
 
         if (is_array($field)) {
-            $field = new SpecificationField($field);
+            $field = new FieldSpecification($field);
         }
 
         $name = $field->getName();
@@ -43,5 +43,15 @@ class Field extends CollectionBase
 
             return ($a->getPosition() > $b->getPosition()) ? 1 : -1;
         });
+    }
+
+    /**
+     * Get fields
+     *
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->collection;
     }
 }

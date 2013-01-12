@@ -1,10 +1,10 @@
 <?php
 namespace FixedWidthFile\SpecificationBuilder;
 
-use FixedWidthFile\Specification\Record as SpecificationRecord;
-use FixedWidthFile\Specification\Field as SpecificationField;
-use FixedWidthFile\Collection\Record as CollectionRecord;
-use FixedWidthFile\Collection\Field as CollectionField;
+use FixedWidthFile\Specification\Record as RecordSpecification;
+use FixedWidthFile\Specification\Field as FieldSpecification;
+use FixedWidthFile\Collection\Record as RecordCollection;
+use FixedWidthFile\Collection\Field as FieldCollection;
 
 class ArrayBuilder extends BaseBuilder
 {
@@ -16,10 +16,10 @@ class ArrayBuilder extends BaseBuilder
      */
     protected function buildFieldCollection($fields)
     {
-        $fieldCollection = new CollectionField;
+        $fieldCollection = new FieldCollection;
         foreach ($fields as $fieldSpecification)
         {
-            $field  = new SpecificationField($fieldSpecification);
+            $field  = new FieldSpecification($fieldSpecification);
             $fieldCollection->addField($field);
         }
 
@@ -33,12 +33,12 @@ class ArrayBuilder extends BaseBuilder
      */
     public function build($specifications)
     {
-        $recordCollection = new CollectionRecord;
+        $recordCollection = new RecordCollection;
         foreach ($specifications as $specification)
         {
             $fieldCollection = $this->buildFieldCollection($specification['fields']);
 
-            $recordSpecification = new SpecificationRecord($specification['recordSpecification']);
+            $recordSpecification = new RecordSpecification($specification['recordSpecification']);
             $recordSpecification->setFieldCollection($fieldCollection);
 
             $recordCollection->addRecord($recordSpecification);

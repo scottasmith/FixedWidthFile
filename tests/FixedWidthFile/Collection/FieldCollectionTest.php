@@ -4,7 +4,7 @@ namespace FixedWidthFile;
 use PHPUnit_Framework_TestCase,
     FixedWidthFile\Specification\Field,
     FixedWidthFile\Specification\TestSpecifications,
-    FixedWidthFile\FieldCollection;
+    FixedWidthFile\Collection\Field as FieldCollection;
 
 class FieldCollectionTest extends PHPUnit_Framework_TestCase
 {
@@ -42,10 +42,10 @@ class FieldCollectionTest extends PHPUnit_Framework_TestCase
         $fieldSpecification = TestSpecifications::getFieldSpecification();
         $this->helper->addField($fieldSpecification);
 
-        $this->helper->removeField('NonExistantField');
+        $this->helper->remove('NonExistantField');
         $this->assertEquals(count($this->helper), 1);
 
-        $this->helper->removeField('RecordIdentifier');
+        $this->helper->remove('RecordIdentifier');
         $this->assertEquals(count($this->helper), 0);
     }
 

@@ -2,10 +2,11 @@
 namespace FixedWidthFile;
 
 use PHPUnit_Framework_TestCase,
-    FixedWidthFile\Specification\Field,
-    FixedWidthFile\Specification\TestSpecifications,
     FixedWidthFile\RecordParser,
-    FixedWidthFile\FieldCollection;
+    FixedWidthFile\Specification\Field as FieldSpecification,
+    FixedWidthFile\Specification\Record as RecordSpecification,
+    FixedWidthFile\Specification\TestSpecifications,
+    FixedWidthFile\Collection\Field as FieldCollection;
 
 class RecordParserTest extends PHPUnit_Framework_TestCase
 {
@@ -13,6 +14,15 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
     {
         $this->helper = new RecordParser;
         parent::setUp();
+    }
+
+    public function testRecordSpecification()
+    {
+        $recordSpec = new RecordSpecification;
+        $this->helper->setRecordSpecification($recordSpec);
+
+        $recordSpec2 = $this->helper->getRecordSpecification();
+        $this->assertEquals($recordSpec->getName(), $recordSpec2->getName());
     }
 
     public function testFieldValidation()
@@ -26,7 +36,7 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
     public function testCheckGoodData()
     {
-        $field = new Field(TestSpecifications::getFieldSpecification());
+        $field = new FieldSpecification(TestSpecifications::getFieldSpecification());
 
         $data = array('RecordIdentifier' => '123abc');
         $ret = $this->helper->checkData($field, $data, $errorString);
@@ -35,7 +45,7 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
     public function testCheckNoData()
     {
-        $field = new Field(TestSpecifications::getFieldSpecification());
+        $field = new FieldSpecification(TestSpecifications::getFieldSpecification());
 
         $data = array();
         $ret = $this->helper->checkData($field, $data, $errorString);
@@ -45,7 +55,7 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
     public function testCheckMandatoryEmptyData()
     {
-        $field = new Field(TestSpecifications::getFieldSpecification());
+        $field = new FieldSpecification(TestSpecifications::getFieldSpecification());
         $field->setMandatory(1);
 
         $data = array('RecordIdentifier' => '');
@@ -56,7 +66,7 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
 
     public function testCheckDataValidation()
     {
-        $field = new Field(TestSpecifications::getFieldSpecification());
+        $field = new FieldSpecification(TestSpecifications::getFieldSpecification());
 
         $data = array('RecordIdentifier' => '£$£$');
         $ret = $this->helper->checkData($field, $data, $errorString);
@@ -64,44 +74,46 @@ class RecordParserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($errorString, 'Validation failed on field RecordIdentifier');
     }
 
-    public function testBuildRecord()
+    private function prepareRecodSpecification()
     {
-        $fieldSpecifications = TestSpecifications::getFieldSpecifications();
+        $specification = TestSpecifications::getRecordLines();
 
         $fieldCollection = new FieldCollection();
-        foreach ($fieldSpecifications as $fieldSpecification) {
-            $field  = new Field($fieldSpecification);
+        foreach ($specification['fields'] as $fieldSpecification) {
+            $field  = new FieldSpecification($fieldSpecification);
             $fieldCollection->addField($field);
         }
 
         $fieldCollection->sortFields();
 
-        $this->helper->setFieldCollection($fieldCollection);
+        $recordSpecification = new RecordSpecification($specification['recordSpecification']);
+        $recordSpecification->setFieldCollection($fieldCollection);
+
+        return $recordSpecification;
+    }
+
+    public function testBuildRecord()
+    {
+        $recordSpecification = $this->prepareRecodSpecification();
+
+        $this->helper->setRecordSpecification($recordSpecification);
         $recordString = $this->helper->buildRecord(array(
-            'RecordIdentifier' => 'TST',
-            'Size' => '0000112233'
+            'SomeField1' => 'TST',
+            'Size' => '112233'
         ));
 
-        $this->assertEquals($recordString, '0000112233TST  ');
+        $this->assertEquals($recordString, 'LINESPEC1TST  00112233');
     }
 
     public function testDecodeRecord()
     {
-        $fieldSpecifications = TestSpecifications::getFieldSpecifications();
+        $recordSpecification = $this->prepareRecodSpecification();
 
-        $fieldCollection = new FieldCollection();
-        foreach ($fieldSpecifications as $fieldSpecification) {
-            $field  = new Field($fieldSpecification);
-            $fieldCollection->addField($field);
-        }
-
-        $fieldCollection->sortFields();
-
-        $this->helper->setFieldCollection($fieldCollection);
+        $this->helper->setRecordSpecification($recordSpecification);
 
         $data = array(
-            'RecordIdentifier' => 'TST',
-            'Size' => '0000112233'
+            'SomeField1' => 'TST',
+            'Size' => '112233'
         );
 
         $recordString = $this->helper->buildRecord($data);

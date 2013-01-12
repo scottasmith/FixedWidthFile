@@ -1,7 +1,8 @@
 <?php
 namespace FixedWidthFile;
 
-use FixedWidthFile\Specification\Record;
+use FixedWidthFile\Specification\Field as FieldSpecification;
+use FixedWidthFile\Specification\Record as RecordSpecification;
 use FixedWidthFile\Exception\ParserException;
 use FixedWidthFile\Collection;
 
@@ -9,7 +10,7 @@ class RecordParser
 {
     /**
      * Record specification
-     * @var Specification\Record
+     * @var RecordSpecification
      */
     protected $recordSpecification;
 
@@ -22,9 +23,9 @@ class RecordParser
     /**
      * Set record specification
      *
-     * @param Specification\Record
+     * @param RecordSpecification
      */
-    public function setRecordSpecification(Record $recordSpecification)
+    public function setRecordSpecification(RecordSpecification $recordSpecification)
     {
         $this->recordSpecification = $recordSpecification;
     }
@@ -32,7 +33,7 @@ class RecordParser
     /**
      * Get record specification
      *
-     * @return Specification\Record
+     * @return RecordSpecification
      */
     public function getRecordSpecification()
     {
@@ -59,12 +60,12 @@ class RecordParser
     /**
      * Check data against fields
      *
-     * @param  Specification\Field
+     * @param  FieldSpecification
      * @param  array $data
      * @param  string error string (out)
      * @return boolean (true - success)
      */
-    public function checkData(Specification\Field $field, $data, &$errorString)
+    public function checkData(FieldSpecification $field, $data, &$errorString)
     {
         $name = $field->getName();
 

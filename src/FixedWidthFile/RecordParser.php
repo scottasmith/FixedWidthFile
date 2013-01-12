@@ -3,20 +3,15 @@ namespace FixedWidthFile;
 
 use FixedWidthFile\Specification\Record;
 use FixedWidthFile\Exception\ParserException;
+use FixedWidthFile\Collection;
 
 class RecordParser
 {
     /**
      * Record specification
-     * @var Record
+     * @var Specification\Record
      */
     protected $recordSpecification;
-
-    /**
-     * Fields
-     * @var FieldCollection
-     */
-    protected $fieldCollection;
 
     /**
      * Formatters
@@ -27,7 +22,7 @@ class RecordParser
     /**
      * Set record specification
      *
-     * @param FieldCollection
+     * @param Specification\Record
      */
     public function setRecordSpecification(Record $recordSpecification)
     {
@@ -37,31 +32,11 @@ class RecordParser
     /**
      * Get record specification
      *
-     * @return FieldCollection
+     * @return Specification\Record
      */
     public function getRecordSpecification()
     {
         return $this->recordSpecification;
-    }
-
-    /**
-     * Set field collection
-     *
-     * @param FieldCollection
-     */
-    public function setFieldCollection(FieldCollection $fieldCollection)
-    {
-        $this->fieldCollection = $fieldCollection;
-    }
-
-    /**
-     * Get field collection
-     *
-     * @return FieldCollection
-     */
-    public function getFieldCollection()
-    {
-        return $this->fieldCollection;
     }
 
     /**
@@ -120,14 +95,19 @@ class RecordParser
      */
     public function buildRecord($data)
     {
-        $record = '';
+        $recordSpecification = $this->getRecordSpecification();
+        if (!$recordSpecification) {
+            throw new ParserException('Record Specification is not set');
+        }
 
-        $fieldCollection = $this->getFieldCollection();
+        $fieldCollection = $recordSpecification->getFieldCollection();
         if (!$fieldCollection) {
             throw new ParserException('Field Collection is not set');
         }
 
         $fieldCollection->sortFields();
+
+        $record = $recordSpecification->getName();
 
         foreach ($fieldCollection as $field) {
             $name         = $field->getName();
@@ -138,12 +118,12 @@ class RecordParser
             }
 
             if (!$this->checkData($field, $data, $errorString)) {
-                throw new \ParserException('Failed to build record - ' . $errorString);
+                throw new ParserException('Failed to build record - ' . $errorString);
             }
 
             $format = $field->getFormat();
             if (!in_array($format, $this->formatters)) {
-                throw new \ParserException("Can't find field formatter for format $format");
+                throw new ParserException("Can't find field formatter for format $format");
             }
 
             $fieldFormatterName = __NAMESPACE__ . '\\Formatters\\' . $format;
@@ -173,7 +153,12 @@ class RecordParser
         $data = array();
         $recordLength = strlen($record);
 
-        $fieldCollection = $this->getFieldCollection();
+        $recordSpecification = $this->getRecordSpecification();
+        if (!$recordSpecification) {
+            throw new ParserException('Record Specification is not set');
+        }
+
+        $fieldCollection = $recordSpecification->getFieldCollection();
         if (!$fieldCollection) {
             throw new ParserException('Field Collection is not set');
         }

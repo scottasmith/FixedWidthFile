@@ -1,15 +1,15 @@
 <?php
 namespace FixedWidthFile\Specification;
 
-use FixedWidthFile\FieldCollection;
+use FixedWidthFile\Collection\Field as FieldCollection;
 
-class Record
+class Record extends SpecificationBase
 {
     /**
-     * File Name
-     * @var string
+     * Fields
+     * @var Collection\FieldCollection
      */
-    protected $name;
+    protected $fieldCollection;
 
     /**
      * File Description
@@ -30,66 +30,23 @@ class Record
     protected $keyField;
 
     /**
-     * Constructor
+     * Set field collection
      *
-     * @param array (optional)
-     * @throws SpecificationException
+     * @param FieldCollection
      */
-    public function __construct($data = null)
+    public function setFieldCollection(FieldCollection $fieldCollection)
     {
-        if (is_array($data)) {
-            $this->fromArray($data);
-        }
+        $this->fieldCollection = $fieldCollection;
     }
 
     /**
-     * Import from array
+     * Get field collection
      *
-     * @param array
-     * @throws SpecificationException
+     * @return FieldCollection
      */
-    public function fromArray($data)
+    public function getFieldCollection()
     {
-        if (!is_array($data)) {
-            throw new SpecificationException('Data is not an Array');
-        }
-
-        $objectVars = get_object_vars($this);
-        foreach ($objectVars as $name => $value) {
-            if (array_key_exists($name, $data)) {
-                $this->$name = $data[$name];
-            }
-        }
-    }
-
-    /**
-     * export to array
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return get_object_vars($this);
-    }
-
-    /**
-     * Set the files name
-     *
-     * @param string
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Get the files name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
+        return $this->fieldCollection;
     }
 
     /**

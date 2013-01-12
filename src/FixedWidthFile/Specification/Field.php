@@ -3,14 +3,8 @@ namespace FixedWidthFile\Specification;
 
 use FixedWidthFile\Specification\SpecificationException;
 
-class Field
+class Field extends SpecificationBase
 {
-    /**
-     * File Name
-     * @var string
-     */
-    protected $name;
-
     /**
      * Field Position
      * @var integer
@@ -46,75 +40,6 @@ class Field
      * @var boolean
      */
     protected $mandatory;
-
-    /**
-     * Constructor
-     *
-     * @param array (optional)
-     * @throws SpecificationException
-     */
-    public function __construct($data = null)
-    {
-        if (is_array($data)) {
-            $this->fromArray($data);
-        }
-    }
-
-    /**
-     * Import from array
-     *
-     * @param array
-     * @throws SpecificationException
-     */
-    public function fromArray($data)
-    {
-        if (!is_array($data)) {
-            throw new SpecificationException('Data is not an Array');
-        }
-
-        $mandatoryFields = array('name', 'position', 'length', 'format', 'validation');
-
-        $objectVars = get_object_vars($this);
-        foreach ($objectVars as $name => $value) {
-            if (in_array($name, $mandatoryFields) && !array_key_exists($name, $data)) {
-                throw new SpecificationException("Mandatory field '$name' does not exist");
-            }
-
-            if (array_key_exists($name, $data)) {
-                $this->$name = $data[$name];
-            }
-        }
-    }
-
-    /**
-     * export to array
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return get_object_vars($this);
-    }
-
-    /**
-     * Get the files name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the files name
-     *
-     * @param string
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
 
     /**
      * Get the field position

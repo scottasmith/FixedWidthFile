@@ -2,52 +2,97 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FixedWidthFile\Specification\Field;
-use FixedWidthFile\Specification\Record;
-use FixedWidthFile\FieldCollection;
+use FixedWidthFile\Specification;
+use FixedWidthFile\Collection;
 use FixedWidthFile\RecordParser;
+use FixedWidthFile\SpecificationBuilder\ArrayBuilder;
 
-$fieldSpecificationList  = array(
+$records = include 'config.php';
+
+$builder = new ArrayBuilder;
+$recordCollection = $builder->build($records);
+
+$testRecords = array(
     array(
-        'name'       => 'RecordIdentifier',
-        'position'   => 0,
-        'length'     => 5,
-        'format'     => 'String',
-        'validation' => '[[:alnum:]]',
-        'defaultValue' => 'DefVal'
+        'identifier' => 'LINESPEC2',
+        'fields'     => array(
+            'SomeField2' => 'ID2',
+            'Size'       => '1302299331'
+        )
     ),
     array(
-        'name'       => 'Size',
-        'position'   => 5,
-        'length'     => '10,2',
-        'format'     => 'LMDecimal',
-        'validation' => '[[:digit:]]'
+        'identifier' => 'LINESPEC1',
+        'fields'     => array(
+            'SomeField1' => 'TST1',
+            'KeyField'   => 1,
+            'Size'       => '11'
+        )
+    ),
+    array(
+        'identifier' => 'LINESPEC1',
+        'fields'     => array(
+            'SomeField1' => 'TST1',
+            'KeyField'   => 2,
+            'Size'       => '22222'
+        )
+    ),
+    array(
+        'identifier' => 'LINESPEC1',
+        'fields'     => array(
+            'SomeField1' => 'TST1',
+            'KeyField'   => 2,
+            'Size'       => '33333'
+        )
     )
 );
 
-$fieldCollection = new FieldCollection();
+echo "Encode: -\n\n";
 
-foreach ($fieldSpecificationList as $fieldSpecification) {
-    $field  = new Field($fieldSpecification);
-    $fieldCollection->addField($field);
+print_r($testRecords);
+
+$lineArray = array();
+foreach ($testRecords as $recordItem) {
+
+    $recordSpecification = $recordCollection->find($recordItem['identifier']);
+    if (!$recordSpecification)
+    {
+        echo "Cannot find specification: {$recordItem['identifier']}\n\n";
+        exit;
+    }
+
+    $parser = new RecordParser;
+    $parser->setRecordSpecification($recordSpecification);
+    $recordString = $parser->buildRecord($recordItem['fields']);
+
+    $lineArray[] = $recordString;
+};
+
+echo implode($lineArray, "\n");
+echo "\n\n";
+
+echo "Decode: -\n\n";
+
+$lineData = array();
+foreach ($lineArray as $line)
+{
+    $recordSpecification = $recordCollection->find($line);
+    if (!$recordSpecification)
+    {
+        echo "Cannot find specification: $recordName\n\n";
+        exit;
+    }
+
+    $recordName = $recordSpecification->getName();
+    $line = substr($line, strLen($recordName));
+
+    $parser = new RecordParser;
+    $parser->setRecordSpecification($recordSpecification);
+    $data = $parser->decodeRecord($line);
+
+    $lineData[] = array(
+        'identifier' => $recordName,
+        'fields'     => $data
+    );
 }
 
-$recordSpecification = new Record(array(
-    'name' => 'TestLine',
-    'description' => 'TestDescription',
-    'priority' => 1,
-    'keyField' => 'RecordIdentifier'
-));
-
-
-$recordParser = new RecordParser;
-$recordParser->setFieldCollection($fieldCollection);
-$recordParser->setRecordSpecification($recordSpecification);
-
-$recordString = $recordParser->buildRecord(array(
-    'RecordIdentifier' => 'TST',
-    'Size' => '1302299331'
-));
-
-$recordData = $recordParser->decodeRecord($recordString);
-print_r($recordData);
+print_r($lineData);

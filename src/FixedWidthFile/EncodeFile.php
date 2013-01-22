@@ -51,7 +51,7 @@ class EncodeFile
             // TODO: This needs working on
             //       Need to sort the specification?
 
-            $recordSpecification = $recordCollection->find($recordItem['identifier']);
+            $recordSpecification = $recordCollection->findItemByName($recordItem['identifier']);
             if (!$recordSpecification)
             {
                 echo "Cannot find specification: {$recordItem['identifier']}\n\n";

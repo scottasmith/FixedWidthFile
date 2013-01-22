@@ -1,5 +1,5 @@
 <?php
-namespace FixedWidthFile\SpecificationBuilder;
+namespace FixedWidthFile\Specification\Builder;
 
 use FixedWidthFile\Specification\Record as RecordSpecification;
 use FixedWidthFile\Specification\Field as FieldSpecification;
@@ -98,9 +98,9 @@ class XmlBuilder implements BuilderInterface
 
         $recordSpecification = new RecordSpecification;
         $recordSpecification->setName($recordNode->getAttribute('name'));
-        $recordSpecification->setDescription($recordNode->getAttribute('description'));
-        $recordSpecification->setPriority($recordNode->getAttribute('priority'));
-        $recordSpecification->setKeyField($recordNode->getAttribute('keyField'));
+        $recordSpecification->setRecordDescription($recordNode->getAttribute('description'));
+        $recordSpecification->setRecordPriority($recordNode->getAttribute('priority'));
+        $recordSpecification->setRecordKeyField($recordNode->getAttribute('keyField'));
         $recordSpecification->setFieldCollection($fieldCollection);
 
         return $recordSpecification;
@@ -140,12 +140,12 @@ class XmlBuilder implements BuilderInterface
             $fieldSpecification = new FieldSpecification;
 
             $fieldSpecification->setName($name);
-            $fieldSpecification->setPosition($fieldNode->getAttribute('pos'));
-            $fieldSpecification->setLength($fieldNode->getAttribute('length'));
-            $fieldSpecification->setFormat($fieldNode->getAttribute('format'));
-            $fieldSpecification->setDefaultValue($fieldNode->getAttribute('defaultValue'));
-            $fieldSpecification->setValidation($fieldNode->getAttribute('validation'));
-            $fieldSpecification->setMandatory($fieldNode->getAttribute('mandatory') ? true : false);
+            $fieldSpecification->setFieldPosition($fieldNode->getAttribute('pos'));
+            $fieldSpecification->setFieldLength($fieldNode->getAttribute('length'));
+            $fieldSpecification->setFieldFormat($fieldNode->getAttribute('format'));
+            $fieldSpecification->setFieldDefaultValue($fieldNode->getAttribute('defaultValue'));
+            $fieldSpecification->setFieldValidation($fieldNode->getAttribute('validation'));
+            $fieldSpecification->setMandatoryField($fieldNode->getAttribute('mandatory') ? true : false);
 
             return $fieldSpecification;
         }

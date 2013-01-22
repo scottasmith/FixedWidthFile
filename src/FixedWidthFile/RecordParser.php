@@ -74,12 +74,12 @@ class RecordParser
             return;
         }
 
-        if ($field->getMandatory() && trim($data[$name]) == '') {
+        if ($field->getMandatoryField() && trim($data[$name]) == '') {
             $errorString = "Mandatory field $name is empty";
             return;
         }
 
-        if (!$this->validateField($data[$name], $field->getValidation())) {
+        if (!$this->validateField($data[$name], $field->getFieldValidation())) {
             $errorString = "Validation failed on field $name";
             return;
         }
@@ -112,7 +112,7 @@ class RecordParser
 
         foreach ($fieldCollection as $field) {
             $name         = $field->getName();
-            $defaultValue = $field->getDefaultValue();
+            $defaultValue = $field->getFieldDefaultValue();
 
             if ((!array_key_exists($name, $data) || empty($data[$name])) && !empty($defaultValue)) {
                 $data[$name] = $defaultValue;
@@ -122,7 +122,7 @@ class RecordParser
                 throw new ParserException('Failed to build record - ' . $errorString);
             }
 
-            $format = $field->getFormat();
+            $format = $field->getFieldFormat();
             if (!in_array($format, $this->formatters)) {
                 throw new ParserException("Can't find field formatter for format $format");
             }
@@ -130,7 +130,7 @@ class RecordParser
             $fieldFormatterName = __NAMESPACE__ . '\\Formatters\\' . $format;
 
             $fieldFormatter = new $fieldFormatterName;
-            $fieldValue = $fieldFormatter->format($data[$name], $field->getLength());
+            $fieldValue = $fieldFormatter->format($data[$name], $field->getFieldLength());
 
             $record .= $fieldValue;
         }
@@ -167,8 +167,8 @@ class RecordParser
         $fieldCollection->sortFields();
 
         foreach ($fieldCollection as $name => $field) {
-            $position = $field->getPosition();
-            $length   = $field->getLength();
+            $position = $field->getFieldPosition();
+            $length   = $field->getFieldLength();
 
             $lengths = explode(',', $length);
             if (count($lengths) > 1) {

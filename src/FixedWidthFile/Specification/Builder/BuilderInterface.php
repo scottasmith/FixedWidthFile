@@ -1,5 +1,5 @@
 <?php
-namespace FixedWidthFile\SpecificationBuilder;
+namespace FixedWidthFile\Specification\Builder;
 
 interface BuilderInterface
 {

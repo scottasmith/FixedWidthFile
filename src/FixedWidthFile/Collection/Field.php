@@ -9,25 +9,36 @@ class Field extends CollectionBase
      * Add item to collection
      *
      * @param  array|FieldSpecification
-     * @return fluent interface
+     * @return boolean
      */
-    public function addField($field)
+    public function addField($fieldSpecification)
     {
-        if (!is_array($field) && !$field instanceof FieldSpecification) {
-            throw new SpecificationException('field needs to be either an array or instance of ' . __NAMESPACE__ . '\\Collection\\Field');
+        if (is_array($fieldSpecification)) {
+            $fieldSpecification = new FieldSpecification($fieldSpecification);
         }
 
-        if (is_array($field)) {
-            $field = new FieldSpecification($field);
+        if (!$this->isFieldSpecification($fieldSpecification))
+        {
+            return;
         }
 
-        $name = $field->getName();
+        $name = $fieldSpecification->getName();
         if (!$name || empty($name)) {
-            throw new SpecificationException('field name cannot be empty');
+            return;
         }
 
-        $this->collection[$name] = $field;
-        return $this;
+        $this->collection[$name] = $fieldSpecification;
+
+        return true;
+    }
+
+    public function isFieldSpecification($fieldSpecification)
+    {
+        if (is_array($fieldSpecification) || $fieldSpecification instanceof FieldSpecification) {
+             return true;
+        }
+
+        return;
     }
 
     /**
@@ -37,11 +48,11 @@ class Field extends CollectionBase
     {
         // Sort the collection by position
         usort($this->collection, function($a, $b) {
-            if ($a->getPosition() == $b->getPosition()) {
+            if ($a->getFieldPosition() == $b->getFieldPosition()) {
                 return 0;
             }
 
-            return ($a->getPosition() > $b->getPosition()) ? 1 : -1;
+            return ($a->getFieldPosition() > $b->getFieldPosition()) ? 1 : -1;
         });
     }
 

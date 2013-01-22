@@ -6,29 +6,24 @@ use FixedWidthFile\Collection\SpecificationBase;
 abstract class CollectionBase
   implements \Iterator, \Countable
 {
-    /**
-     * Collection array
-     * @var array
-     */
+    // @var array
     protected $collection = array();
 
     /**
-     * Find item
-     *  warning - This resets the iterator on the collection array
+     * warning - This resets the iterator on the collection array
      *
-     * @param string $data
+     * @param string
      * @return SpecificationBase|NULL
      */
-    public function find($data)
+    public function findItemByName($nameToFind)
     {
-        if (empty($data)) {
+        if (empty($nameToFind)) {
             return;
         }
 
         foreach ($this->collection as $itemName => $itemObject) {
-            $nameLength = strlen($itemName);
-
-            if (substr($data, 0, $nameLength) == $itemName) {
+            if($this->isItemNameMatch($itemName, $nameToFind))
+            {
                 return $itemObject;
             }
         }
@@ -36,24 +31,24 @@ abstract class CollectionBase
         return;
     }
 
-    /**
-     * Remove item from array
-     *
-     * @param  string name
-     * @return fluent interface
-     */
-    public function remove($name)
+    public function isItemNameMatch($itemName, $nameToFind)
+    {
+        $nameLength = strlen($itemName);
+
+        if (substr($nameToFind, 0, $nameLength) == $itemName) {
+            return true;
+        }
+    }
+
+    public function removeItemByName($name)
     {
         if (array_key_exists($name, $this->collection)) {
             unset($this->collection[$name]);
+            return true;
         }
-
-        return $this;
     }
 
     /**
-     * Return Iterator Value
-     *
      * @return Field
      */
     public function current()
@@ -61,48 +56,27 @@ abstract class CollectionBase
         return current($this->collection);
     }
 
-    /**
-     * Return Iterator Key
-     *
-     * @return string
-     */
     public function key()
     {
         return key($this->collection);
     }
 
-    /**
-     * Next Iterator
-     */
     public function next()
     {
         return next($this->collection);
     }
 
-    /**
-     * Next Iterator
-     */
     public function rewind()
     {
         return reset($this->collection);
     }
 
-    /**
-     * Is Iterator valid
-     *
-     * @return boolean
-     */
     public function valid()
     {
         $key = key($this->collection);
         return isset($this->collection[$key]);
     }
 
-    /**
-     * Return count
-     *
-     * @return integer
-     */
     public function count()
     {
         return count($this->collection);

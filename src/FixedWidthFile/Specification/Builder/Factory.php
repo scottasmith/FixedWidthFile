@@ -1,7 +1,7 @@
 <?php
-namespace FixedWidthFile\SpecificationBuilder;
+namespace FixedWidthFile\Specification\Builder;
 
-class BuilderFactory
+class Factory
 {
     /**
      * @param array

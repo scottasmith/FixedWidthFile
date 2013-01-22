@@ -13,7 +13,6 @@ class SpecificationBase
      * Constructor
      *
      * @param array (optional)
-     * @throws SpecificationException
      */
     public function __construct($data = null)
     {
@@ -26,12 +25,11 @@ class SpecificationBase
      * Import from array
      *
      * @param array
-     * @throws SpecificationException
      */
     public function fromArray($data)
     {
         if (!is_array($data)) {
-            throw new SpecificationException('data is not an Array');
+            return;
         }
 
         $objectVars = get_object_vars($this);

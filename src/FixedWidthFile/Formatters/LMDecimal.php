@@ -8,45 +8,65 @@ class LMDecimal implements FormatterInterface
      *
      * @param  mixed   $data
      * @param  integer $length
-     * @param  boolean $debug (optional)
      * @return mixed
      */
-    public function format($data, $length, $debug = false)
+    public function format($data, $length)
     {
         $lengths = explode(",", $length);
 
 		if(strpos($data, ".")) {
-            // We found the decimal place. we can use this
-			$parts = explode(".", $data);
-			$value = sprintf("%0{$lengths[0]}d", $parts[0]);
-
-            if (array_key_exists(1, $lengths)) {
-                $value.= str_pad($parts[1], $lengths[1], '0');
-            }
+            $value = $this->getFormatWithDecimal($data, $lengths);
         }
         else {
-            // No decimal place found. If there are two lengths then fake it
-            $value = intval(substr($data, 0, $lengths[0]));
-
-            if (array_key_exists(1, $lengths)) {
-                $value2 = intval(substr($data, $lengths[0], $lengths[1]));
-
-                if ($value2 > 0) {
-                    $value .= $value2;
-                }
-
-                $value = str_pad($value, $lengths[0] + $lengths[1], '0', STR_PAD_LEFT);
-            }
-            else {
-                $value = str_pad($value, $lengths[0], '0', STR_PAD_LEFT);
-            }
+            $value = $this->getFormatNoDecimal($data, $lengths);
 		}
 
-        if ($debug) {
-            return 'DecimalFormat: (' . $data . ',' . $length . ',' . $value . ')';
+        return $value;
+    }
+
+    private function getFormatWithDecimal($data, $lengths)
+    {
+        $parts = explode(".", $data);
+        $value = sprintf("%0{$lengths[0]}d", $parts[0]);
+
+        if (array_key_exists(1, $lengths)) {
+            $value.= str_pad($parts[1], $lengths[1], '0');
+        }
+
+        return $value;
+    }
+
+    private function getFormatNoDecimal($data, $lengths)
+    {
+        $value = intval(substr($data, 0, $lengths[0]));
+
+        if (array_key_exists(1, $lengths)) {
+            $value.= $this->getMultipleLengthValue($data, $lengths);
         }
         else {
-            return $value;
+            $value.= $this->getSingleLengthValue($data, $lengths[0]);
         }
+
+        return $value;
+    }
+
+    private function getMultipleLengthValue($data, $lengths)
+    {
+        $returnValue = '';
+
+        $value = intval(substr($data, $lengths[0], $lengths[1]));
+
+        if ($value > 0) {
+            $returnValue .= $value;
+        }
+
+        $returnValue = str_pad($returnValue, $lengths[0] + $lengths[1], '0', STR_PAD_LEFT);
+
+        return $returnValue;
+    }
+
+    private function getSingleLengthValue($data, $length)
+    {
+        return  str_pad($data, $length, '0', STR_PAD_LEFT);
     }
 }

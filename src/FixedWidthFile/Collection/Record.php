@@ -2,7 +2,6 @@
 namespace FixedWidthFile\Collection;
 
 use FixedWidthFile\Specification\Record as RecordSpecification;
-use FixedWidthFile\Specification\Exception\SpecificationException;
 
 class Record extends CollectionBase
 {
@@ -10,24 +9,35 @@ class Record extends CollectionBase
      * Add item to collection
      *
      * @param  array|RecordSpecification
-     * @return fluent interface
+     * @return boolean
      */
-    public function addRecord($record)
+    public function addRecord($recordSpecification)
     {
-        if (!is_array($record) && !$record instanceof RecordSpecification) {
-            throw new SpecificationException('record needs to be either an array or instance of ' . __NAMESPACE__ . '\\Specification\\Record');
+        if (is_array($recordSpecification)) {
+            $recordSpecification = new RecordSpecification($recordSpecification);
         }
 
-        if (is_array($record)) {
-            $record = new RecordSpecification($record);
+        if (!$this->isRecordSpecification($recordSpecification))
+        {
+            return;
         }
 
-        $name = $record->getName();
+        $name = $recordSpecification->getName();
         if (!$name || empty($name)) {
-            throw new SpecificationException('record name cannot be empty');
+            return;
         }
 
-        $this->collection[$name] = $record;
-        return $this;
+        $this->collection[$name] = $recordSpecification;
+
+        return true;
+    }
+
+    public function isRecordSpecification($recordSpecification)
+    {
+        if (is_array($recordSpecification) || $recordSpecification instanceof RecordSpecification) {
+             return true;
+        }
+
+        return;
     }
 }

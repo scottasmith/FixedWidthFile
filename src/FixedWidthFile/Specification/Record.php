@@ -5,33 +5,19 @@ use FixedWidthFile\Collection\Field as FieldCollection;
 
 class Record extends SpecificationBase
 {
-    /**
-     * Fields
-     * @var Collection\FieldCollection
-     */
+    // @var Collection\FieldCollection
     protected $fieldCollection;
 
-    /**
-     * File Description
-     * @var string
-     */
+    // @var string
     protected $description;
 
-    /**
-     * Priority
-     * @var integer
-     */
+    // @var integer
     protected $priority;
 
-    /**
-     * Key Field
-     * @var string
-     */
+    // @var string
     protected $keyField;
 
     /**
-     * Set field collection
-     *
      * @param FieldCollection
      */
     public function setFieldCollection(FieldCollection $fieldCollection)
@@ -40,8 +26,6 @@ class Record extends SpecificationBase
     }
 
     /**
-     * Get field collection
-     *
      * @return FieldCollection
      */
     public function getFieldCollection()
@@ -50,61 +34,49 @@ class Record extends SpecificationBase
     }
 
     /**
-     * Set the files description
-     *
      * @param string
      */
-    public function setDescription($description)
+    public function setRecordDescription($description)
     {
         $this->description = $description;
     }
 
     /**
-     * Get the files description
-     *
      * @return string
      */
-    public function getDescription()
+    public function getRecordDescription()
     {
         return $this->description;
     }
 
     /**
-     * Set the priority
-     *
      * @param integer
      */
-    public function setPriority($priority)
+    public function setRecordPriority($priority)
     {
         $this->priority = $priority;
     }
 
     /**
-     * Get the priority
-     *
      * @return integer
      */
-    public function getPriority()
+    public function getRecordPriority()
     {
         return $this->priority;
     }
 
     /**
-     * Set the key field
-     *
      * @param string
      */
-    public function setKeyField($keyField)
+    public function setRecordKeyField($keyField)
     {
         $this->keyField = $keyField;
     }
 
     /**
-     * Get the key field
-     *
      * @return string
      */
-    public function getKeyField()
+    public function getRecordKeyField()
     {
         return $this->keyField;
     }

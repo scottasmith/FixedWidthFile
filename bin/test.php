@@ -2,7 +2,7 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FixedWidthFile\SpecificationBuilder\BuilderFactory;
+use FixedWidthFile\Specification\Builder\Factory as BuilderFactory;
 use FixedWidthFile\Collection;
 use FixedWidthFile\RecordParser;
 use FixedWidthFile\EncodeFile;

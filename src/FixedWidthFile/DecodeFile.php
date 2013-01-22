@@ -50,7 +50,7 @@ class DecodeFile
         $lineData = array();
         foreach ($lineArray as $line)
         {
-            $recordSpecification = $recordCollection->find($line);
+            $recordSpecification = $recordCollection->findItemByName($line);
             if (!$recordSpecification)
             {
                 echo "Cannot find specification: $recordName\n\n";

@@ -1,5 +1,5 @@
 <?php
-namespace FixedWidthFile\SpecificationBuilder;
+namespace FixedWidthFile\Specification\Builder;
 
 use FixedWidthFile\Specification\Record as RecordSpecification;
 use FixedWidthFile\Specification\Field as FieldSpecification;

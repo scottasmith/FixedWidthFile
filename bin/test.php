@@ -2,20 +2,17 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FixedWidthFile\Specification;
-use FixedWidthFile\SpecificationBuilder\ArrayBuilder;
+use FixedWidthFile\SpecificationBuilder\BuilderFactory;
 use FixedWidthFile\Collection;
 use FixedWidthFile\RecordParser;
 use FixedWidthFile\EncodeFile;
 use FixedWidthFile\DecodeFile;
 
-$records = include 'config.php';
-
 $testRecords = array(
     array(
         'identifier' => 'LINESPEC2',
         'fields'     => array(
-            'SomeField2' => 'ID2',
+            'SomeField2' => '12345',
             'Size'       => '1302299331'
         )
     ),
@@ -45,8 +42,12 @@ $testRecords = array(
     )
 );
 
-$builder = new ArrayBuilder;
-$recordCollection = $builder->build($records);
+//$records = include 'config.php';
+//$builder = BuilderFactory::createArrayBuilder($records);
+//$recordCollection = $builder->getRecordCollection();
+
+$builder = BuilderFactory::createXmlBuilder('TestFile.xml');
+$recordCollection = $builder->getRecordCollection();
 
 echo "Encode: -\n\n";
 

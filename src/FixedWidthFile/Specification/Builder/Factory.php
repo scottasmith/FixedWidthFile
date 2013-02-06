@@ -32,4 +32,13 @@ class Factory
 
         return $builder;
     }
+
+    /**
+     * @param BuilderInterface
+     */
+    public function createClassBuilder(BuilderInterface $builder)
+    {
+        $builder->buildRecordCollection();
+        return $builder;
+    }
 }

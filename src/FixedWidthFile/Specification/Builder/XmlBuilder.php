@@ -5,38 +5,24 @@ use FixedWidthFile\Specification\Record as RecordSpecification;
 use FixedWidthFile\Specification\Field as FieldSpecification;
 use FixedWidthFile\Collection\Record as RecordCollection;
 use FixedWidthFile\Collection\Field as FieldCollection;
+use FixedWidthFile\Specification\Builder\Exception\Exception;
 
-class XmlBuilder implements BuilderInterface
+class XmlBuilder extends AbstractBuilder
 {
-    // @var RecordCollection
-    protected $recordCollection;
-
     // @var \DomDocument
     protected $xmlDom;
 
-    public function __construct()
-    {
-        $this->recordCollection = new RecordCollection;
-    }
-
-    public function getRecordCollection()
-    {
-        return $this->recordCollection;
-    }
-
+    /**
+     * @throws ParserException
+     */
     public function buildRecordCollectionFromXmlFile($xmlFilename)
     {
-        if (!file_exists($xmlFilename))
-        {
-            return;
+        if (!file_exists($xmlFilename)) {
+            throw new Exception("Xml file does not exist ($xmlFilename)");
         }
 
         $this->xmlDom = $this->getDomDocument($xmlFilename);
         $fileNode = $this->getFileNode();
-        if (!$fileNode)
-        {
-            return;
-        }
 
         $recordNodeList = $this->getRecordNodeList($fileNode);
 
@@ -57,12 +43,11 @@ class XmlBuilder implements BuilderInterface
     protected function getFileNode()
     {
         $nodes = $this->xmlDom->getElementsByTagName('file');
-        if ($nodes && $nodes->length > 0)
-        {
-            return $nodes->item(0);
+        if (!$nodes || $nodes->length == 0) {
+            throw new Exception("Cannot find the 'file' element in the Xml file");
         }
 
-        return;
+        return $nodes->item(0);
     }
 
     /**
@@ -72,8 +57,11 @@ class XmlBuilder implements BuilderInterface
     protected function getRecordNodeList(\DOMNode $fileNode)
     {
         $nodes = $fileNode->getElementsByTagName('line');
+        if (!$nodes || $nodes->length == 0) {
+            throw new Exception("Cannot find the 'line' element in the Xml file");
+        }
 
-        return $nodes ? $nodes : new DOMNodeList;
+        return $nodes;
     }
 
     /**
@@ -81,8 +69,7 @@ class XmlBuilder implements BuilderInterface
      */
     protected function buildRecordCollectionFromNodeList(\DOMNodeList $recordNodeList)
     {
-        foreach ($recordNodeList as $recordNode)
-        {
+        foreach ($recordNodeList as $recordNode) {
             $recordSpecification = $this->getRecordSpecificationFromNode($recordNode);
             $this->recordCollection->addRecord($recordSpecification);
         }
@@ -94,13 +81,19 @@ class XmlBuilder implements BuilderInterface
      */
     protected function getRecordSpecificationFromNode(\DOMNode $recordNode)
     {
-        $fieldCollection = $this->getFieldCollectionFromNode($recordNode->childNodes);
+        $name = $this->getValue($recordNode, 'name');
 
         $recordSpecification = new RecordSpecification;
-        $recordSpecification->setName($recordNode->getAttribute('name'));
-        $recordSpecification->setRecordDescription($recordNode->getAttribute('description'));
-        $recordSpecification->setRecordPriority($recordNode->getAttribute('priority'));
-        $recordSpecification->setRecordKeyField($recordNode->getAttribute('keyField'));
+        $recordSpecification->setName($name);
+        $recordSpecification->setRecordDescription($this->getValue($recordNode, 'description'));
+        $recordSpecification->setRecordPriority($this->getValue($recordNode, 'priority'));
+        $recordSpecification->setRecordKeyField($this->getValue($recordNode, 'keyField'));
+
+        if (!$recordNode->hasChildNodes()) {
+            throw new Exception("No fields defined for record $name");
+        }
+
+        $fieldCollection = $this->getFieldCollectionFromNode($recordNode->childNodes);
         $recordSpecification->setFieldCollection($fieldCollection);
 
         return $recordSpecification;
@@ -114,12 +107,10 @@ class XmlBuilder implements BuilderInterface
     {
         $fieldCollection = new FieldCollection;
 
-        foreach($fieldNodeList as $fieldNode)
-        {
+        foreach($fieldNodeList as $fieldNode) {
             $fieldSpecification = $this->getFieldSpecificationFromNode($fieldNode);
 
-            if ($fieldSpecification)
-            {
+            if ($fieldSpecification) {
                 $fieldCollection->addField($fieldSpecification);
             }
         }
@@ -128,28 +119,42 @@ class XmlBuilder implements BuilderInterface
     }
 
     /**
-     * @param DOMNodeList
+     * @param DOMNode
      * @return FieldSpecification|NULL
      */
     protected function getFieldSpecificationFromNode($fieldNode)
     {
-        if ($fieldNode->nodeName == 'field')
-        {
-            $name = $fieldNode->getAttribute('name');
+        if ($fieldNode->nodeName == 'field') {
+            $name = $this->getValue($fieldNode, 'name');
 
             $fieldSpecification = new FieldSpecification;
 
             $fieldSpecification->setName($name);
-            $fieldSpecification->setFieldPosition($fieldNode->getAttribute('pos'));
-            $fieldSpecification->setFieldLength($fieldNode->getAttribute('length'));
-            $fieldSpecification->setFieldFormat($fieldNode->getAttribute('format'));
-            $fieldSpecification->setFieldDefaultValue($fieldNode->getAttribute('defaultValue'));
-            $fieldSpecification->setFieldValidation($fieldNode->getAttribute('validation'));
-            $fieldSpecification->setMandatoryField($fieldNode->getAttribute('mandatory') ? true : false);
+            $fieldSpecification->setFieldPosition($this->getValue($fieldNode, 'pos'));
+            $fieldSpecification->setFieldLength($this->getValue($fieldNode, 'length'));
+            $fieldSpecification->setFieldFormat($this->getValue($fieldNode, 'format'));
+            $fieldSpecification->setFieldDefaultValue($this->getValue($fieldNode, 'defaultValue', true));
+            $fieldSpecification->setFieldValidation($this->getValue($fieldNode, 'validation'));
+            $mandatory = $this->getValue($fieldNode, 'mandatory', true);
+            $fieldSpecification->setMandatoryField($mandatory ? true : false);
 
             return $fieldSpecification;
         }
 
         return;
+    }
+
+    /**
+     * @param DOMNode
+     * @param string
+     * @param boolean
+     */
+    protected function getValue($source, $key, $nullOk = false)
+    {
+        if (!$source->hasAttribute($key) && !$nullOk) {
+            throw new Exception("Cannot find attribute $key");
+        }
+
+        return !$source->hasAttribute($key) ? '' : $source->getAttribute($key);
     }
 }

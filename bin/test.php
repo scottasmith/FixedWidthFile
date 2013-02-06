@@ -3,50 +3,23 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use FixedWidthFile\Specification\Builder\Factory as BuilderFactory;
-use FixedWidthFile\Collection;
-use FixedWidthFile\RecordParser;
 use FixedWidthFile\EncodeFile;
 use FixedWidthFile\DecodeFile;
 
-$testRecords = array(
-    array(
-        'identifier' => 'LINESPEC2',
-        'fields'     => array(
-            'SomeField2' => '12345',
-            'Size'       => '1302299331'
-        )
-    ),
-    array(
-        'identifier' => 'LINESPEC1',
-        'fields'     => array(
-            'SomeField1' => 'TST1',
-            'KeyField'   => 1,
-            'Size'       => '11'
-        )
-    ),
-    array(
-        'identifier' => 'LINESPEC1',
-        'fields'     => array(
-            'SomeField1' => 'TST1',
-            'KeyField'   => 2,
-            'Size'       => '22222'
-        )
-    ),
-    array(
-        'identifier' => 'LINESPEC1',
-        'fields'     => array(
-            'SomeField1' => 'TST1',
-            'KeyField'   => 2,
-            'Size'       => '33333'
-        )
-    )
-);
+$testRecords = include 'TestRecords.php';
+$arraySpecification = include 'TestArraySpecification.php';
+$xmlSpecificationFile = 'TestFile.xml';
+include 'TestClassSpecification.php';
 
-//$records = include 'config.php';
-//$builder = BuilderFactory::createArrayBuilder($records);
-//$recordCollection = $builder->getRecordCollection();
+try {
+    //$builder = BuilderFactory::createArrayBuilder($arraySpecification);
+    //$builder = BuilderFactory::createXmlBuilder($xmlSpecificationFile);
+    $builder = BuilderFactory::createClassBuilder(new TestClassSpecification);
+}
+catch(Exception $ex) {
+    die('Error: ' . $ex->getMessage() . "\n\n\n");
+}
 
-$builder = BuilderFactory::createXmlBuilder('TestFile.xml');
 $recordCollection = $builder->getRecordCollection();
 
 echo "Encode: -\n\n";

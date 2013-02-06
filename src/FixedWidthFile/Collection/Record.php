@@ -3,7 +3,7 @@ namespace FixedWidthFile\Collection;
 
 use FixedWidthFile\Specification\Record as RecordSpecification;
 
-class Record extends CollectionBase
+class Record extends AbstractCollection
 {
     /**
      * Add item to collection

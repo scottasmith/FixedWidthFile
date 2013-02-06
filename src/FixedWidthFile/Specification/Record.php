@@ -3,7 +3,7 @@ namespace FixedWidthFile\Specification;
 
 use FixedWidthFile\Collection\Field as FieldCollection;
 
-class Record extends SpecificationBase
+class Record extends AbstractSpecification
 {
     // @var Collection\FieldCollection
     protected $fieldCollection;

@@ -3,7 +3,7 @@ namespace FixedWidthFile\Collection;
 
 use FixedWidthFile\Collection\SpecificationBase;
 
-abstract class CollectionBase
+abstract class AbstractCollection
   implements \Iterator, \Countable
 {
     // @var array

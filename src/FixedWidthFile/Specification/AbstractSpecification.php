@@ -1,7 +1,7 @@
 <?php
 namespace FixedWidthFile\Specification;
 
-class SpecificationBase
+abstract class AbstractSpecification
 {
     /**
      * File Name

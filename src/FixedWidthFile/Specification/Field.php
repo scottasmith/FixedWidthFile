@@ -1,7 +1,7 @@
 <?php
 namespace FixedWidthFile\Specification;
 
-class Field extends SpecificationBase
+class Field extends AbstractSpecification
 {
     // @var integer
     protected $position;

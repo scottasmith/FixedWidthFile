@@ -14,11 +14,12 @@ abstract class AbstractCollection
      *
      * @param string
      * @return SpecificationBase|NULL
+     * @throws Exception
      */
     public function findItemByName($nameToFind)
     {
         if (empty($nameToFind)) {
-            return;
+            throw new Exception('nameToFind is an empty string');
         }
 
         foreach ($this->collection as $itemName => $itemObject) {

@@ -6,8 +6,6 @@ use FixedWidthFile\Specification\Record as RecordSpecification;
 class Record extends AbstractCollection
 {
     /**
-     * Add item to collection
-     *
      * @param  array|RecordSpecification
      * @return boolean
      */

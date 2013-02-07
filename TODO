@@ -1,0 +1,4 @@
+Things to be finished
+
+* Make sure all naming is consistent. should getName be getIdentifier?
+* DecodeFile class needs finishing off

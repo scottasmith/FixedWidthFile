@@ -2,20 +2,20 @@
 namespace FixedWidthFile;
 
 use FixedWidthFile\Collection\Record as RecordCollection;
-use FixedWidthFile\RecordParser;
+use FixedWidthFile\Specification\Record as RecordSpecification;
+use FixedWidthFile\Specification\Field as FieldSpecification;
+use FixedWidthFile\Exception\ParserException;
+use FixedWidthFile\Formatters\FormatterInterface;
 
 class EncodeFile
 {
     /**
-     * Record collection
      * @var RecordCollection
      */
     protected $recordCollection;
 
     /**
-     * Set record collection
-     *
-     * @param RecordCollection $recordCollection
+     * @param RecordCollection
      */
     public function setRecordCollection(RecordCollection $recordCollection)
     {
@@ -23,48 +23,172 @@ class EncodeFile
     }
 
     /**
-     * Get record collection
-     *
      * @return RecordCollection
      */
     public function getRecordCollection()
     {
+        if (!$this->recordCollection) {
+            throw new ParserException('Record collection is not set');
+        }
+
         return $this->recordCollection;
     }
 
     /**
-     * Encode using data
-     *
-     * @param array $data
+     * @param array
      * @return string
+     * @throws ParserException
      */
-    public function encode($data)
+    public function encode($multiRecordArray)
     {
-        $recordCollection = $this->getRecordCollection();
-        if (!$recordCollection) {
-            throw new \Exception('TODO: new exception : Record collection is not set');
-        }
-
         $lineArray = array();
 
-        foreach ($data as $recordItem) {
-            // TODO: This needs working on
-            //       Need to sort the specification?
+        foreach ($multiRecordArray as $recordArray) {
+            $lineArray[] = $this->buildRecord($recordArray);
+        }
 
-            $recordSpecification = $recordCollection->findItemByName($recordItem['identifier']);
-            if (!$recordSpecification)
-            {
-                echo "Cannot find specification: {$recordItem['identifier']}\n\n";
-                exit;
+        $lineArray = $this->sortRecordsByPriority($lineArray);
+
+        array_walk($lineArray, function(&$retArray) {
+            $retArray = $retArray['line'];
+        });
+
+        return $lineArray;
+    }
+
+    /**
+     * @param array
+     * @return array
+     */
+    public function sortRecordsByPriority($lineArray)
+    {
+        usort($lineArray, function($a, $b) {
+            if ($a['priority'] == $b['priority']) {
+                return 0;
             }
 
-            $parser = new RecordParser;
-            $parser->setRecordSpecification($recordSpecification);
-            $recordString = $parser->buildRecord($recordItem['fields']);
+            return ($a['priority'] > $b['priority']) ? 1 : -1;
+        });
 
-            $lineArray[] = $recordString;
-        };
+        return $lineArray;
+    }
 
-        return implode("\n", $lineArray);
+    /**
+     * @param array
+     * @return array
+     * @throws ParserException
+     */
+    public function buildRecord($recordArray)
+    {
+        $recordSpecification = $this->findRecordSpecification($recordArray['identifier']);
+
+        $fieldCollection = $recordSpecification->getFieldCollection();
+        $fieldCollection->sortFields();
+
+        $recordString = $recordSpecification->getName();
+
+        foreach ($fieldCollection as $fieldSpecification) {
+            $recordString .= $this->buildField($fieldSpecification, $recordArray['fields']);
+        }
+
+        $lineArray = array(
+            'line' => $recordString,
+            'priority' => $recordSpecification->getRecordPriority()
+        );
+
+        return $lineArray;
+    }
+
+    /**
+     * @param string
+     * @return RecordSpecification
+     */
+    public function findRecordSpecification($identifier)
+    {
+        $recordCollection = $this->getRecordCollection();
+        $recordSpecification = $recordCollection->findItemByName($identifier);
+
+        if (!$recordSpecification)
+        {
+            throw new ParserException("Cannot find record by name '$identifier'");
+        }
+
+        return $recordSpecification;
+    }
+
+    /**
+     * @param array
+     * @return string
+     * @throws ParserException
+     */
+    public function buildField(FieldSpecification $fieldSpecification, $fieldArray)
+    {
+        $name         = $fieldSpecification->getName();
+        $defaultValue = $fieldSpecification->getFieldDefaultValue();
+
+        if ((!array_key_exists($name, $fieldArray) || empty($fieldArray[$name])) && !empty($defaultValue)) {
+            $fieldArray[$name] = $defaultValue;
+        }
+
+        $this->verifyFieldValid($fieldSpecification, $fieldArray);
+
+        $fieldFormatter = $this->getFieldFormatter($fieldSpecification->getFieldFormat());
+        $fieldString = $fieldFormatter->format($fieldArray[$name], $fieldSpecification->getFieldLength());
+
+        return $fieldString;
+    }
+
+    /**
+     * @param FieldSpecification
+     * @param array
+     * @throws ParserException
+     */
+    public function verifyFieldValid(FieldSpecification $fieldSpecification, $fieldValue)
+    {
+        $name = $fieldSpecification->getName();
+
+        if (!array_key_exists($name, $fieldValue)) {
+            throw new ParserException("Field $name not provided");
+        }
+
+        if ($fieldSpecification->getMandatoryField() && trim($fieldValue[$name]) == '') {
+            throw new ParserException("Mandatory field $name is empty");
+        }
+
+        $validation = $fieldSpecification->getFieldValidation();
+        if (!empty($validation) && !$this->validateField($fieldValue[$name], $validation)) {
+            throw new ParserException("Validation failed on field $name");
+        }
+    }
+
+    /**
+     * @array string
+     * @return FormatterInterface
+     */
+    public function getFieldFormatter($fieldFormat)
+    {
+        $fieldFormaterClassName = __NAMESPACE__ . '\\Formatters\\' . $fieldFormat;
+
+        if (!class_exists($fieldFormaterClassName)) {
+            throw new ParserException("Can't find field formatter for format $fieldFormaterClassName");
+        }
+
+        $fieldFormatter = new $fieldFormaterClassName;
+        return $fieldFormatter;
+    }
+
+    /**
+     * @param string
+     * @param string
+     */
+    public function validateField($value, $regex)
+    {
+        $regex = '/^' . $regex . '+$/';
+
+        if (!preg_match($regex, $value)) {
+            return;
+        }
+
+        return true;
     }
 }

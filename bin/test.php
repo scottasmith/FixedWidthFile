@@ -26,13 +26,14 @@ echo "Encode: -\n\n";
 
 $encode = new EncodeFile;
 $encode->setRecordCollection($recordCollection);
-$lines = $encode->encode($testRecords);
-echo $lines;
+$linesArray = $encode->encode($testRecords);
+$linesString = implode("\n", $linesArray);
+echo $linesString;
 
 echo "\n\n";
 echo "Decode: -\n\n";
 
 $decode = new DecodeFile;
 $decode->setRecordCollection($recordCollection);
-$data = $decode->decode($lines);
+$data = $decode->decode($linesString);
 print_r($data);

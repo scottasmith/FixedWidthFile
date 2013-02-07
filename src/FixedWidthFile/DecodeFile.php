@@ -60,9 +60,7 @@ class DecodeFile
             $recordName = $recordSpecification->getName();
             $line = substr($line, strLen($recordName));
 
-            $parser = new RecordParser;
-            $parser->setRecordSpecification($recordSpecification);
-            $data = $parser->decodeRecord($line);
+            $data = $this->decodeRecord($recordSpecification, $line);
 
             $lineData[] = array(
                 'identifier' => $recordName,
@@ -71,5 +69,51 @@ class DecodeFile
         }
 
         return $lineData;
+    }
+
+    /**
+     * @param string
+     * @return array
+     * @throws ParserException
+     */
+    public function decodeRecord($recordSpecification, $record)
+    {
+        if (!is_string($record)) {
+            throw new ParserException('Value given is not a string');
+        }
+
+        $data = array();
+        $recordLength = strlen($record);
+
+        if (!$recordSpecification) {
+            throw new ParserException('Record Specification is not set');
+        }
+
+        $fieldCollection = $recordSpecification->getFieldCollection();
+        if (!$fieldCollection) {
+            throw new ParserException('Field Collection is not set');
+        }
+
+        $fieldCollection->sortFields();
+
+        foreach ($fieldCollection as $name => $field) {
+            $position = $field->getFieldPosition();
+            $length   = $field->getFieldLength();
+
+            $lengths = explode(',', $length);
+            if (count($lengths) > 1) {
+                $length = $lengths[0] + $lengths[1];
+            }
+
+            if ($position > $recordLength || ($position + $length) > $recordLength) {
+                throw new \ParserException('Invalid record length or record specifiction');
+            }
+
+            $value = substr($record, $position, $length);
+
+            $data[$field->getName()] = $value;
+        }
+
+        return $data;
     }
 }

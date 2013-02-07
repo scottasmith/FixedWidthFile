@@ -6,8 +6,6 @@ use FixedWidthFile\Specification\Field as FieldSpecification;
 class Field extends AbstractCollection
 {
     /**
-     * Add item to collection
-     *
      * @param  array|FieldSpecification
      * @return boolean
      */
@@ -41,9 +39,6 @@ class Field extends AbstractCollection
         return;
     }
 
-    /**
-     * Sort collection by the position
-     */
     public function sortFields()
     {
         // Sort the collection by position
@@ -57,8 +52,6 @@ class Field extends AbstractCollection
     }
 
     /**
-     * Get fields
-     *
      * @return array
      */
     public function getFields()

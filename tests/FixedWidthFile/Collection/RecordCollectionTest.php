@@ -46,12 +46,12 @@ class RecordCollectionTest extends PHPUnit_Framework_TestCase
         $recordSpecification = TestSpecifications::getRecordSpecification();
         $this->helper->addRecord($recordSpecification);
 
-        $this->helper->remove('NonExistantRecord');
+        $this->helper->removeItemByName('NonExistantRecord');
 
         $this->assertEquals(count($this->helper), 1,
                             'Number of records in collection does not match');
 
-        $this->helper->remove('LINESPEC1');
+        $this->helper->removeItemByName('LINESPEC1');
         $this->assertEquals(count($this->helper), 0,
                             'Number of records in collection does not match');
     }

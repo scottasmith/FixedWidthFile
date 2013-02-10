@@ -26,8 +26,8 @@ class FieldTest extends PHPUnit_Framework_TestCase
     {
         $testVal = 10;
 
-        $this->helper->setPosition($testVal);
-        $value = $this->helper->getPosition();
+        $this->helper->setFieldPosition($testVal);
+        $value = $this->helper->getFieldPosition();
 
         $this->assertEquals($value, $testVal);
     }
@@ -36,8 +36,8 @@ class FieldTest extends PHPUnit_Framework_TestCase
     {
         $testVal = 10;
 
-        $this->helper->setLength($testVal);
-        $value = $this->helper->getLength();
+        $this->helper->setFieldLength($testVal);
+        $value = $this->helper->getFieldLength();
 
         $this->assertEquals($value, $testVal);
     }
@@ -46,8 +46,8 @@ class FieldTest extends PHPUnit_Framework_TestCase
     {
         $testVal = 'String';
 
-        $this->helper->setFormat($testVal);
-        $value = $this->helper->getFormat();
+        $this->helper->setFieldFormat($testVal);
+        $value = $this->helper->getFieldFormat();
 
         $this->assertEquals($value, $testVal);
     }
@@ -56,8 +56,8 @@ class FieldTest extends PHPUnit_Framework_TestCase
     {
         $testVal = 'SomeDefaultValue';
 
-        $this->helper->setDefaultValue($testVal);
-        $value = $this->helper->getDefaultValue();
+        $this->helper->setFieldDefaultValue($testVal);
+        $value = $this->helper->getFieldDefaultValue();
 
         $this->assertEquals($value, $testVal);
     }
@@ -66,8 +66,8 @@ class FieldTest extends PHPUnit_Framework_TestCase
     {
         $testVal = '[[:alnum:]]';
 
-        $this->helper->setValidation($testVal);
-        $value = $this->helper->getValidation();
+        $this->helper->setFieldValidation($testVal);
+        $value = $this->helper->getFieldValidation();
 
         $this->assertEquals($value, $testVal);
     }
@@ -76,8 +76,8 @@ class FieldTest extends PHPUnit_Framework_TestCase
     {
         $testVal = 1;
 
-        $this->helper->setMandatory($testVal);
-        $value = $this->helper->getMandatory();
+        $this->helper->setMandatoryField($testVal);
+        $value = $this->helper->getMandatoryField();
 
         $this->assertEquals($value, true);
     }
@@ -90,17 +90,19 @@ class FieldTest extends PHPUnit_Framework_TestCase
             'length'     => 5,
             'format'     => 'String',
             'validation' => '[[:alnum:]]',
-            'defaultValue' => 'DefVal'
+            'defaultValue' => 'DefVal',
+            'mandatory'  => false,
         );
 
         $this->helper->fromArray($fieldData);
 
         $this->assertEquals($this->helper->getName(), $fieldData['name']);
-        $this->assertEquals($this->helper->getPosition(), $fieldData['position']);
-        $this->assertEquals($this->helper->getLength(), $fieldData['length']);
-        $this->assertEquals($this->helper->getFormat(), $fieldData['format']);
-        $this->assertEquals($this->helper->getValidation(), $fieldData['validation']);
-        $this->assertEquals($this->helper->getDefaultValue(), $fieldData['defaultValue']);
+        $this->assertEquals($this->helper->getFieldPosition(), $fieldData['position']);
+        $this->assertEquals($this->helper->getFieldLength(), $fieldData['length']);
+        $this->assertEquals($this->helper->getFieldFormat(), $fieldData['format']);
+        $this->assertEquals($this->helper->getFieldValidation(), $fieldData['validation']);
+        $this->assertEquals($this->helper->getFieldDefaultValue(), $fieldData['defaultValue']);
+        $this->assertEquals($this->helper->getMandatoryField(), $fieldData['mandatory']);
     }
 
     public function testToArray()
@@ -111,12 +113,13 @@ class FieldTest extends PHPUnit_Framework_TestCase
             'length'     => 5,
             'format'     => 'String',
             'validation' => '[[:alnum:]]',
-            'defaultValue' => 'DefVal'
+            'defaultValue' => 'DefVal',
+            'mandatory'  => false,
         );
 
         $this->helper->fromArray($fieldData);
         $fieldDataNew = $this->helper->toArray();
 
-        $this->assertTrue((string)$fieldData === (string)$fieldDataNew);
+        $this->assertTrue($fieldData == $fieldDataNew);
     }
 }

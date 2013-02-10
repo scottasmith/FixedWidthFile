@@ -38,13 +38,13 @@ class LMDecimal implements FormatterInterface
 
     private function getFormatNoDecimal($data, $lengths)
     {
-        $value = intval(substr($data, 0, $lengths[0]));
-
         if (array_key_exists(1, $lengths)) {
+            $value = intval(substr($data, 0, $lengths[0]));
             $value.= $this->getMultipleLengthValue($data, $lengths);
         }
         else {
-            $value.= $this->getSingleLengthValue($data, $lengths[0]);
+            $data = intval($data);
+            $value = $this->getSingleLengthValue($data, $lengths[0]);
         }
 
         return $value;

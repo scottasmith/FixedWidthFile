@@ -45,11 +45,11 @@ class FieldCollectionTest extends PHPUnit_Framework_TestCase
         $fieldSpecification = TestSpecifications::getFieldSpecification();
         $this->helper->addField($fieldSpecification);
 
-        $this->helper->remove('NonExistantField');
+        $this->helper->removeItemByName('NonExistantField');
         $this->assertEquals(count($this->helper), 1,
                             'Number of records in collection does not match');
 
-        $this->helper->remove('RecordIdentifier');
+        $this->helper->removeItemByName('RecordIdentifier');
         $this->assertEquals(count($this->helper), 0,
                             'Number of records in collection does not match');
     }
@@ -61,11 +61,11 @@ class FieldCollectionTest extends PHPUnit_Framework_TestCase
         $field = new Field($fieldSpecification);
         $this->helper->addField($field);
 
-        $fields = $this->helper->getFields();
+        $fields = $this->helper->getCollectionArray();
 
         $fieldDataNew = $fields['RecordIdentifier']->toArray();
 
-        $this->assertTrue((string)$fieldDataNew === (string)$fieldSpecification,
+        $this->assertTrue($fieldDataNew == $fieldSpecification,
                           'Returned field specification does not match original');
     }
 
@@ -80,11 +80,11 @@ class FieldCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->helper->sortFields();
 
-        $fields = $this->helper->getFields();
+        $fields = $this->helper->getCollectionArray();
 
-        $this->assertEquals($fields[0]->getPosition(), 0,
+        $this->assertEquals($fields[0]->getFieldPosition(), 0,
                             'Field 0 position is not valid');
-        $this->assertEquals($fields[1]->getPosition(), 10,
+        $this->assertEquals($fields[1]->getFieldPosition(), 10,
                             'Field 0 position is not valid');
     }
 }

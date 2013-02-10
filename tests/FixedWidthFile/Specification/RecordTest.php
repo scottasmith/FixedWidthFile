@@ -12,7 +12,7 @@ class RecordTest extends PHPUnit_Framework_TestCase
         parent::setUp();
     }
 
-    public function testFieldName()
+    public function testRecordName()
     {
         $testVal = 'SomeName';
 
@@ -22,32 +22,32 @@ class RecordTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($value, $testVal);
     }
 
-    public function testFieldDescrption()
+    public function testRecordDescrption()
     {
         $testVal = 'TestDescription';
 
-        $this->helper->setDescription($testVal);
-        $value = $this->helper->getDescription();
+        $this->helper->setRecordDescription($testVal);
+        $value = $this->helper->getRecordDescription();
 
         $this->assertEquals($value, $testVal);
     }
 
-    public function testFieldPriority()
+    public function testRecordPriority()
     {
         $testVal = 3;
 
-        $this->helper->setPriority($testVal);
-        $value = $this->helper->getPriority();
+        $this->helper->setRecordPriority($testVal);
+        $value = $this->helper->getRecordPriority();
 
         $this->assertEquals($value, $testVal);
     }
 
-    public function testFieldKeyField()
+    public function testRecordKeyField()
     {
         $testVal = 'RecordIdentifier';
 
-        $this->helper->setKeyField($testVal);
-        $value = $this->helper->getKeyField();
+        $this->helper->setRecordKeyField($testVal);
+        $value = $this->helper->getRecordKeyField();
 
         $this->assertEquals($value, $testVal);
     }
@@ -64,9 +64,9 @@ class RecordTest extends PHPUnit_Framework_TestCase
         $this->helper->fromArray($recordData);
 
         $this->assertEquals($this->helper->getName(), $recordData['name']);
-        $this->assertEquals($this->helper->getDescription(), $recordData['description']);
-        $this->assertEquals($this->helper->getPriority(), $recordData['priority']);
-        $this->assertEquals($this->helper->getKeyField(), $recordData['keyField']);
+        $this->assertEquals($this->helper->getRecordDescription(), $recordData['description']);
+        $this->assertEquals($this->helper->getRecordPriority(), $recordData['priority']);
+        $this->assertEquals($this->helper->getRecordKeyField(), $recordData['keyField']);
     }
 
     public function testToArray()
@@ -81,6 +81,9 @@ class RecordTest extends PHPUnit_Framework_TestCase
         $this->helper->fromArray($recordData);
         $recordDataNew = $this->helper->toArray();
 
-        $this->assertTrue((string)$recordData === (string)$recordDataNew);
+        // Discard the collection as we are not testing that here
+        unset($recordDataNew['fieldCollection']);
+
+        $this->assertTrue($recordData == $recordDataNew);
     }
 }

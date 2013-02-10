@@ -32,6 +32,11 @@ abstract class AbstractCollection
         return;
     }
 
+    /**
+     * @param string
+     * @param string
+     * @return boolean
+     */
     public function isItemNameMatch($itemName, $nameToFind)
     {
         $nameLength = strlen($itemName);
@@ -41,12 +46,24 @@ abstract class AbstractCollection
         }
     }
 
+    /**
+     * @param string
+     * @return boolean
+     */
     public function removeItemByName($name)
     {
         if (array_key_exists($name, $this->collection)) {
             unset($this->collection[$name]);
             return true;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getCollectionArray()
+    {
+        return $this->collection;
     }
 
     /**

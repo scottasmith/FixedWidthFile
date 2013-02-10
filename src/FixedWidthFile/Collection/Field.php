@@ -50,12 +50,4 @@ class Field extends AbstractCollection
             return ($a->getFieldPosition() > $b->getFieldPosition()) ? 1 : -1;
         });
     }
-
-    /**
-     * @return array
-     */
-    public function getFields()
-    {
-        return $this->collection;
-    }
 }
